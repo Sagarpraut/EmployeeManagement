@@ -1,0 +1,1 @@
+﻿create table Registration(FirstName varchar(20),LastName varchar(20),EmailID varchar(20),Pass varchar(20));
