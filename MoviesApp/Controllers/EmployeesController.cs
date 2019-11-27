@@ -25,7 +25,7 @@ namespace MoviesApp.Controllers
         }
 
         // GET: Employees/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -53,7 +53,7 @@ namespace MoviesApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Empno,Firstnme,Middle,Lastname,Workdept,Phoneno,Hiredate,Job,Birthdate,Salary")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Firstnme,Middle,Lastname,Workdept,Phoneno,Job,Salary,Empno")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace MoviesApp.Controllers
         }
 
         // GET: Employees/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -85,7 +85,7 @@ namespace MoviesApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Empno,Firstnme,Middle,Lastname,Workdept,Phoneno,Hiredate,Job,Birthdate,Salary")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("Firstnme,Middle,Lastname,Workdept,Phoneno,Job,Salary,Empno")] Employee employee)
         {
             if (id != employee.Empno)
             {
@@ -116,7 +116,7 @@ namespace MoviesApp.Controllers
         }
 
         // GET: Employees/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -136,7 +136,7 @@ namespace MoviesApp.Controllers
         // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employee.FindAsync(id);
             _context.Employee.Remove(employee);
@@ -144,7 +144,7 @@ namespace MoviesApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EmployeeExists(string id)
+        private bool EmployeeExists(int id)
         {
             return _context.Employee.Any(e => e.Empno == id);
         }

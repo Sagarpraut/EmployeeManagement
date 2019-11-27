@@ -1,0 +1,29 @@
+﻿USE [EmpDB]
+GO
+
+/****** Object: SqlProcedure [dbo].[spAddEmployee] Script Date: 27-11-2019 16:55:24 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER procedure spAddEmployee     
+(    
+    @FIRSTNAME VARCHAR(12),     
+    @MIDDLE VARCHAR(10),    
+    @LASTNAME VARCHAR(15),
+	@WORKDEPT CHAR(30),     
+    @PHONENO CHAR(40),    
+    @HIREDATE date,
+	@JOB CHAR(8),     
+    @BIRTHDATE date,
+    @SALARY DECIMAL(9,2)
+	
+)    
+as     
+Begin     
+    Insert into EMPLOYEE (FIRSTNME,MIDDLE,LASTNAME,WORKDEPT,PHONENO,HIREDATE,JOB,BIRTHDATE,SALARY)     
+    Values (@FIRSTNAME,@MIDDLE,@LASTNAME,@WORKDEPT,@PHONENO,@HIREDATE,@JOB,@BIRTHDATE,@SALARY)
+END

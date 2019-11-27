@@ -74,15 +74,6 @@ namespace MoviesApp.Controllers
 
 
 
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
-
-
-
-
-
         public IActionResult RegisterSql()
         {
             return View();
