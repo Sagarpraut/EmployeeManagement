@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,50 +14,76 @@ namespace MoviesApp.Controllers
 {
     public class EmployeesController : Controller
     {
-        //EmpDataAccessLayer empDataAccessLayer = new EmpDataAccessLayer();
-        EmpDataAccessLayer2 empDataAccessLayer;
-        public EmployeesController(EmpDBContext context)
+        IEmpDataAccessLayer empDataAccessLayer;
+
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
+
+        public EmployeesController(IMediator mediator, IMapper mapper, IEmpDataAccessLayer _empDataAccessLayer)
         {
-            empDataAccessLayer = new EmpDataAccessLayer2(context);
+            empDataAccessLayer = _empDataAccessLayer;
+            _mediator = mediator;
+            _mapper = mapper;
         }
 
         // GET: Employees
         public IActionResult Index()
         {
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+         
             return View(empDataAccessLayer.Employee());
+
         }
-        
         // GET: Employees/Details/5
         public IActionResult Details(int? id)
         {
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (id == null)
             {
                 return NotFound();
             }
 
-            var employee = empDataAccessLayer.GetEmployeeData(id);
+            var employee = _mediator.Send(new GetEmpDetailsRequestModel { EmpId = id });
             if (employee == null)
             {
                 return NotFound();
             }
 
-            return View(employee);
+            return View(employee.Result);
         }
 
         // GET: Employees/Create
         public IActionResult Create()
         {
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
         EmpDataAccessLayer objemp = new EmpDataAccessLayer();
 
         [HttpPost]
-       
-        public IActionResult Create(Employee emp)
+
+        public ActionResult Create(EmployeeRequestModel emp)
         {
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid)
             {
-                objemp.AddEmp(emp);
+
+
+                _mediator.Send(emp);
+
                 return RedirectToAction("index");
             }
             else
@@ -68,22 +97,33 @@ namespace MoviesApp.Controllers
         public IActionResult Edit(int? id)
         {
 
-          Employee emp = objemp.GetEmployeeData(id);
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
-            return View(emp);
+            var stud = _mediator.Send(new GetEmpDetailsRequestModel { EmpId = id });
+            return View(_mapper.Map<EditEmpRequestModel>(stud.Result));
+
+
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int Empno, [Bind]Employee emp)
+        public ActionResult Edit(int Empno, EditEmpRequestModel emp)
         {
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (Empno != emp.Empno)
             {
                 return NotFound();
             }
             if (ModelState.IsValid)
             {
-                objemp.UpdateEmployee(emp);
+                _mediator.Send(emp);
+
                 return RedirectToAction("Index");
             }
             return View("Index");
@@ -92,114 +132,31 @@ namespace MoviesApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
-            objemp.Remove(id);
+            if (checkInvalidSession())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            
+            _mediator.Send(new DeleteEmpRequestModel { EmpId = id });
+
             return RedirectToAction("Index");
         }
 
-
-
-        /*
-        // POST: Employees/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Firstnme,Middle,Lastname,Workdept,Phoneno,Job,Salary,Empno")] Employee employee)
+        //session management
+        public IActionResult Logout()
         {
-            if (ModelState.IsValid)
+            HttpContext.Session.Remove("email");
+            return RedirectToAction("Index", "Home");
+        }
+        public bool checkInvalidSession()
+        {
+            if (HttpContext.Session.GetString("email") == null)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["SessionError"] = "Invalid Session. Login Again";
+                return true;
             }
-            return View(employee);
-        }
-        */
-        // GET: Employees/Edit/5
-        /*  public async Task<IActionResult> Edit(int? id)
-          {
-              if (id == null)
-              {
-                  return NotFound();
-              }
-
-              var employee = await _context.Employee.FindAsync(id);
-              if (employee == null)
-              {
-                  return NotFound();
-              }
-              return View(employee);
-          }
-
-          // POST: Employees/Edit/5
-          // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-          // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-          [HttpPost]
-          [ValidateAntiForgeryToken]
-          public async Task<IActionResult> Edit(int id, [Bind("Firstnme,Middle,Lastname,Workdept,Phoneno,Job,Salary,Empno")] Employee employee)
-          {
-              if (id != employee.Empno)
-              {
-                  return NotFound();
-              }
-
-              if (ModelState.IsValid)
-              {
-                  try
-                  {
-                      _context.Update(employee);
-                      await _context.SaveChangesAsync();
-                  }
-                  catch (DbUpdateConcurrencyException)
-                  {
-                      if (!EmployeeExists(employee.Empno))
-                      {
-                          return NotFound();
-                      }
-                      else
-                      {
-                          throw;
-                      }
-                  }
-                  return RedirectToAction(nameof(Index));
-              }
-              return View(employee);
-          }
-          */
-        // GET: Employees/Delete/5
-
-        /*
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
+            else return false;
         }
 
-        var employee = await _context.Employee
-            .FirstOrDefaultAsync(m => m.Empno == id);
-        if (employee == null)
-        {
-            return NotFound();
-        }
-
-        return View(employee);
-    }
-
-    // POST: Employees/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var employee = await _context.Employee.FindAsync(id);
-        _context.Employee.Remove(employee);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-    */
-      /*  private bool EmployeeExists(int id)
-        {
-            return _context.Employee.Any(e => e.Empno == id);
-        }*/
     }
 }

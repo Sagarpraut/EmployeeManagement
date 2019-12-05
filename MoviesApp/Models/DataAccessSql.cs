@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace MoviesApp.Models
 {
-    public class DataAccessSql
+    public class DataAccessSql : IUserDataAccessLayer
     {
         string connectionString = "Server=FSIND-LT-08\\SQLEXPRESS;Database=EmpDB;Trusted_Connection=True;";
         public bool CheckLogin(Registration user)
         {
             using (SqlConnection con = new SqlConnection(connectionString))
             {
-                
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Registration WHERE EmailID=@val1 AND pass=(@val2)",con);
-                SqlParameter emailParameter = cmd.Parameters.Add("@val1", SqlDbType.VarChar,30);
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Registration WHERE EmailID=@val1 AND pass=(@val2)", con);
+                SqlParameter emailParameter = cmd.Parameters.Add("@val1", SqlDbType.VarChar, 30);
                 emailParameter.Value = user.EmailId;
-                SqlParameter passParameter = cmd.Parameters.Add("@val2", SqlDbType.VarChar,30);
+                SqlParameter passParameter = cmd.Parameters.Add("@val2", SqlDbType.VarChar, 30);
                 passParameter.Value = user.Pass;
 
                 con.Open();
@@ -56,11 +56,38 @@ namespace MoviesApp.Models
                 cmd.Parameters.AddWithValue("@Pass", user.Pass);
 
 
-
                 con.Open();
                 cmd.ExecuteNonQuery();
                 con.Close();
             }
+        }
+
+        //session management
+        public Registration GetUserDetails(string emailId)
+        {
+            Registration user = new Registration();
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Registration WHERE EmailId =@id", con);
+                SqlParameter idParameter = cmd.Parameters.Add("@id", SqlDbType.VarChar, 30);
+                idParameter.Value = emailId;
+                con.Open();
+                cmd.Prepare();
+                SqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    cmd.Parameters.AddWithValue("@FirstName", user.FirstName);
+                    cmd.Parameters.AddWithValue("@LastName", user.LastName);
+                    cmd.Parameters.AddWithValue("@EmailID", user.EmailId);
+                    cmd.Parameters.AddWithValue("@Pass", user.Pass);
+
+                }
+                cmd.Dispose();
+            }
+
+            return user;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MoviesApp.Models
 {
-    public class EmpDataAccessLayer2
+    public class EmpDataAccessLayer2 : IEmpDataAccessLayer
     {
         EmpDBContext empDBContext;
 
@@ -13,7 +13,6 @@ namespace MoviesApp.Models
         {
             empDBContext = context;
         }
-
 
         public void AddEmp(Employee employee)
         {
@@ -44,7 +43,6 @@ namespace MoviesApp.Models
             empDBContext.Update(employee);
             empDBContext.SaveChanges();
         }
-
 
 
         public Employee GetEmployeeData(int? id)

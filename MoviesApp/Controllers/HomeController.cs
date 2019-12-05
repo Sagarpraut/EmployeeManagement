@@ -3,20 +3,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MoviesApp.Models;
+using MediatR;
+
 
 namespace MoviesApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IMediator _mediator;
+
         DataAccessSql dataAccessSql = new DataAccessSql();
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IMediator mediator)
         {
-            _logger = logger;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -24,65 +28,15 @@ namespace MoviesApp.Controllers
             return View();
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult Login(User user)
-        {
-            UserDataAccessLayer userDataAccessLayer = new UserDataAccessLayer();
-
-            string email = user.EmailID;
-            string pass = user.Password;
-
-            bool success = userDataAccessLayer.checkUserLogin(email, pass);
-
-            if (success)
-                return RedirectToAction("Index", "Employees");
-            else
-            {
-                ViewData["Error"] = "Invalid Details";
-                return View();
-            }
-
-
-        }
-
-
-
-        public IActionResult Register()
-        {
-            return View();
-        }
-        
-        [HttpPost]
-        public ActionResult Register(User user)
-        {
-            UserDataAccessLayer userDataAccessLayer = new UserDataAccessLayer();
-
-
-            userDataAccessLayer.addUser(user);
-
-            ViewData["EmailID"] = user.EmailID;
-
-            return View("Login");
-        }
-
-
-
-
-
         public IActionResult RegisterSql()
         {
             return View();
         }
 
         [HttpPost]
-        public ActionResult RegisterSql(Registration user)
+        public ActionResult RegisterSql(RegisterRequestModel user)
         {
-            dataAccessSql.AddUser(user);
+            _mediator.Send(user);
             return View("LoginSql");
         }
 
@@ -92,12 +46,17 @@ namespace MoviesApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult LoginSql(Registration user)
+        public ActionResult LoginSql(LoginRequestModel user)
         {
-            bool success = dataAccessSql.CheckLogin(user);
+           
+
+            var result = _mediator.Send(user);
+            bool success = result.Result.Success;
 
             if (success)
             {
+                HttpContext.Session.SetString("email", user.EmailId); //session managament
+             //  TempData["User"] = LoginHandler.email;
                 return RedirectToAction("Index", "Employees");
             }
             else
@@ -105,12 +64,8 @@ namespace MoviesApp.Controllers
                 ViewData["Error"] = "Invalid Details";
                 return View();
             }
-            
+
         }
-
-
-       
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -119,59 +74,3 @@ namespace MoviesApp.Controllers
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
- SQL
-[HttpPost]
-public IActionResult Login(User user)
-{
-    DataAccessSql dataAccess = new DataAccessSql();
-    bool success = dataAccess.CheckLogin(user);
-    if (success)
-    {
-        return RedirectToAction("Index", "Employee");
-    }
-    else
-    {
-        ViewData["Error"] = "Invalid Details";
-        return View();
-    }
-}*/
-
-
-/*
-JSON
-      [HttpPost]
-        public ActionResult Login(User user)
-        {
-            UserDataAccessLayer userDataAccessLayer = new UserDataAccessLayer();
-
-            string email = user.EmailID;
-            string pass = user.Password;
-
-            bool success = userDataAccessLayer.checkUserLogin(email, pass);
-
-            if (success)
-                return RedirectToAction("Index","Employees");
-            else
-            {
-                ViewData["Error"] = "Invalid Details";
-                return View();
-            }
-
-
-        }*/

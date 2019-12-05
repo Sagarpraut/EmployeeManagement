@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MoviesApp.Models
 {
-    public class EmpDataAccessLayer
+    public class EmpDataAccessLayer : IEmpDataAccessLayer
     {
         string connectionString = "Server=FSIND-LT-08\\SQLEXPRESS;Database=EmpDB;Trusted_Connection=True;";
 
@@ -92,7 +92,7 @@ namespace MoviesApp.Models
         }
 
 
-        public void Remove(int? id)
+        public void Delete(int? id)
         {
             using SqlConnection con = new SqlConnection(connectionString);
             SqlCommand cmd = new SqlCommand("spDeleteEmployee", con);
@@ -141,10 +141,6 @@ namespace MoviesApp.Models
 
 
     }
-
-
-    
-
 }
 
 
