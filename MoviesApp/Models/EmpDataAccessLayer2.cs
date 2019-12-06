@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MoviesApp.Models
 {
@@ -13,9 +12,14 @@ namespace MoviesApp.Models
         {
             empDBContext = context;
         }
-
         public void AddEmp(Employee employee)
         {
+            if (string.IsNullOrEmpty(employee.Firstnme))
+            {
+                throw new ArgumentNullException();
+
+            }
+
             empDBContext.Add(employee);
             empDBContext.SaveChanges();
         }

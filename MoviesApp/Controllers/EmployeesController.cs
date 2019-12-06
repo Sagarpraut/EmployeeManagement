@@ -73,6 +73,8 @@ namespace MoviesApp.Controllers
 
         public ActionResult Create(EmployeeRequestModel emp)
         {
+            
+
             if (checkInvalidSession())
             {
                 return RedirectToAction("Index", "Home");
@@ -80,10 +82,7 @@ namespace MoviesApp.Controllers
 
             if (ModelState.IsValid)
             {
-
-
                 _mediator.Send(emp);
-
                 return RedirectToAction("index");
             }
             else
@@ -102,8 +101,8 @@ namespace MoviesApp.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var stud = _mediator.Send(new GetEmpDetailsRequestModel { EmpId = id });
-            return View(_mapper.Map<EditEmpRequestModel>(stud.Result));
+            var emp = _mediator.Send(new GetEmpDetailsRequestModel { EmpId = id });
+            return View(_mapper.Map<EditEmpRequestModel>(emp.Result));
 
 
         }

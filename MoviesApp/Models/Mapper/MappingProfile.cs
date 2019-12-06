@@ -27,8 +27,7 @@ namespace MoviesApp.Models.Mapper
 
 
             CreateMap<Employee,GetEmpDetailsResponseModelResult>().ReverseMap();
-
-
+           
             CreateMap<EditEmpRequestModel, GetEmpDetailsResponseModelResult>().ReverseMap();
 
 
