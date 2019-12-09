@@ -44,13 +44,17 @@ namespace XUnitTestEmployee
         [Fact]
         public void Test_Valid_Emp()
         {
-            var mockEmp = new Mock<Employee>();
+          //  var mockEmp = new Mock<Employee>();
 
             var empdataaccesslayer2 = new Mock<IEmpDataAccessLayer>();
-            empdataaccesslayer2.Setup(dal => dal.AddEmp(It.IsAny<Employee>()))
-                .Returns(true);
 
-            Employee employee = new Employee { Firstnme = "UnitTest", Middle = "Ss", Lastname = "Test", Job = "IT", Empno = 1, Phoneno = "8007885744", Salary = 20000, Workdept = "IT" };
+            empdataaccesslayer2.Setup(dal => dal.AddEmp(It.Is<Employee>
+           (emp => !string.IsNullOrEmpty(emp.Firstnme)
+            == !string.IsNullOrEmpty(emp.Lastname)
+            == !string.IsNullOrEmpty(emp.Middle)
+          ))).Returns(true);
+
+            Employee employee = new Employee { Middle = "Ss", Lastname = "Test", Job = "IT", Empno = 1, Phoneno = "8007885744", Salary = 20000, Workdept = "IT" };
             Assert.True(empdataaccesslayer2.Object.AddEmp(employee));
         }
     }
