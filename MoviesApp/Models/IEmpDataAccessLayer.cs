@@ -4,7 +4,7 @@ namespace MoviesApp.Models
 {
     public interface IEmpDataAccessLayer
     {
-        void AddEmp(Employee Emp);
+        bool AddEmp(Employee Emp);
         void Delete(int? id);
         IEnumerable<Employee> Employee();
         Employee GetEmployeeData(int? EMPNO);

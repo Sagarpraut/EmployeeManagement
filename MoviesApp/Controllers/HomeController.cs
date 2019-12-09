@@ -56,7 +56,7 @@ namespace MoviesApp.Controllers
             if (success)
             {
                 HttpContext.Session.SetString("email", user.EmailId); //session managament
-             //  TempData["User"] = LoginHandler.email;
+            
                 return RedirectToAction("Index", "Employees");
             }
             else

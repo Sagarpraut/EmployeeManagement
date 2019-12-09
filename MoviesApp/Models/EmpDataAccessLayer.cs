@@ -12,8 +12,21 @@ namespace MoviesApp.Models
     {
         string connectionString = "Server=FSIND-LT-08\\SQLEXPRESS;Database=EmpDB;Trusted_Connection=True;";
 
-        public void AddEmp(Employee Emp)
+        public bool AddEmp(Employee Emp)
         {
+            if (string.IsNullOrEmpty(Emp.Firstnme))
+            {
+                throw new ArgumentNullException(Emp.Firstnme);
+            }
+            else if (string.IsNullOrEmpty(Emp.Middle))
+            {
+                throw new ArgumentNullException(Emp.Middle);
+            }
+            else if (string.IsNullOrEmpty(Emp.Lastname))
+            {
+                throw new ArgumentNullException(Emp.Lastname);
+            }
+
             using SqlConnection con = new SqlConnection(connectionString);
             {
                 SqlCommand cmd = new SqlCommand("spAddEmployee", con);
@@ -31,6 +44,8 @@ namespace MoviesApp.Models
                 cmd.ExecuteNonQuery();
 
                 con.Close();
+
+                return true;
             }
         }
 

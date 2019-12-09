@@ -12,16 +12,27 @@ namespace MoviesApp.Models
         {
             empDBContext = context;
         }
-        public void AddEmp(Employee employee)
+        public bool AddEmp(Employee employee)
         {
             if (string.IsNullOrEmpty(employee.Firstnme))
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("First Nameshould not be null ");
+            }
 
+            if(string.IsNullOrEmpty(employee.Lastname))
+            {
+                throw new ArgumentNullException("Last Name should not be null ");
+            }
+
+            if (string.IsNullOrEmpty(employee.Middle))
+            {
+                throw new ArgumentNullException("Last Name should not be null ");
             }
 
             empDBContext.Add(employee);
             empDBContext.SaveChanges();
+
+            return true;
         }
 
 
